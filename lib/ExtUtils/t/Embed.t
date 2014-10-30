@@ -12,6 +12,7 @@ use Config;
 use ExtUtils::Embed;
 use File::Spec;
 use IPC::Cmd qw(can_run);
+use Test::More;
 
 my $cc = $Config{'cc'};
 if ( $Config{usecrosscompile} && !can_run($cc) ) {
@@ -28,7 +29,7 @@ print $fh <DATA>;
 close($fh);
 
 $| = 1;
-print "1..10\n";
+plan tests => 3;
 
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
 my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ /(?<!\S)-Zexe\b/;
@@ -149,13 +150,18 @@ if ($^O eq 'VMS' && !$status) {
   print "# @cmd2\n";
   $status = system(join(' ',@cmd2));
 }
-print (($status? 'not ': '')."ok 1\n");
+is($status, 0, "build correctly");
 
 my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^O eq 'VMS';
 print "# embed_test = $embed_test\n";
-$status = system($embed_test);
-print (($status? 'not ':'')."ok 10 # system returned $status\n");
+@out = `$embed_test`;
+chomp @out;
+is_deeply(\@out,
+   [ map "ok $_", 2..9 ],
+   "check test output");
+$status = $?;
+is($status, 0, "embedded code run correctly");
 unlink($exe,"embed_test.c",$obj);
 unlink("$exe.manifest") if $cl and $Config{'ccversion'} =~ /^(\d+)/ and $1 >= 14;
 unlink("$exe$Config{exe_ext}") if $skip_exe;
