@@ -7808,7 +7808,7 @@ posix_to_vmsspec_hardway(char *vmspath, int vmspath_len, const char *unixpath,
 	    esa[seg_len] = 0;
 	}
 	else {
-	    seg_len = my_strlcpy(esa, unixptr, sizeof(esa));
+	    seg_len = my_strlcpy(esa, unixptr, vmspath_len);
 	}
 	/* trnlnm(section) */
 	islnm = vmstrnenv(esa, trn, 0, fildev, 0);
