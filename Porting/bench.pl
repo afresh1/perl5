@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+    use Data::Dumper;
+use strict;
+use warnings;
 #
 # A tool for analysing the performance of the code snippets found in
 # t/perf/benchmarks or similar
@@ -498,10 +501,12 @@ my %OPTS = (
         'tests=s'     => \$OPTS{tests},
         'v|verbose'   => \$OPTS{verbose},
         'write|w=s'   => \$OPTS{write},
+        'khw'         => \$OPTS{khw},
     ) or die "Use the -h option for usage information.\n";
 
     usage if $OPTS{help};
 
+    $OPTS{raw} = 1 if $OPTS{khw};
 
     if (defined $OPTS{read} or defined $OPTS{write}) {
         # fail early if it's not present
@@ -1583,7 +1588,9 @@ sub grind_format_cell {
 sub grind_print {
     my ($results, $averages, $perls, $tests, $order) = @_;
 
-    my @perl_names = map $_->[0], @$perls;
+    #print Dumper __LINE__ . ": ", $perls;
+    push @$perls, [ './perl', 'Ratio %', {}, '' ] if $OPTS{khw};
+
     my @perl_labels = map $_->[1], @$perls;
     my %perl_labels;
     $perl_labels{$_->[0]} = $_->[1] for @$perls;
@@ -1592,6 +1599,47 @@ sub grind_print {
     grind_blurb($perls);
 
     my @test_names = sorted_test_names($results, $order, $perls);
+    #print Dumper __LINE__ . ": ", $perls;
+    #print __LINE__, Dumper $results;
+    #print Dumper __LINE__, \%perl_labels;
+    #print Dumper $order;
+
+    if ($OPTS{khw}) {
+        my $original = $perl_labels[0];
+        my $revised = $perl_labels[1];
+        foreach my $test (keys %$results) {
+            my $test_original = $results->{$test}{$original};
+            foreach my $data_point (keys %$test_original) {
+                my $original_value = $test_original->{$data_point};
+                my $revised_value = $results->{$test}{$revised}{$data_point};
+                #print __LINE__, Dumper $test, $original_value;
+                my $improvement;
+                my $denominator = (( $original_value >= $revised_value)
+                                   ? $revised_value
+                                   : $original_value)
+                                || 1;
+                #print __LINE__, Dumper "original inverse " . (1.0 / eval $original_value);
+                #print __LINE__, Dumper "revised inverse " . (1.0 / eval $revised_value);
+                #print __LINE__, Dumper "subtraction " . ((1.0 / eval $original_value)  - (1.0 / eval $revised_value));
+                #$improvement = 100 * ((1.0 / eval $original_value)  - (1.0 / eval $revised_value));
+                #$improvement = 100 * ($original_value - $revised_value) / $original_value;
+                if ($original_value == $revised_value) {
+                    $improvement = 100;
+                }
+                elsif ($revised_value == 0) {
+                    $improvement = 1000000000;
+                }
+                else {
+                    $improvement = 100 * $original_value / $revised_value;
+                }
+
+                #print __LINE__, Dumper "improvement $test: $data_point: " . $improvement;
+                $results->{$test}{$perl_labels[2]}->{$data_point} = $improvement;
+            }
+        }
+    }
+    #print Dumper __LINE__, $results;
+
 
     my @fields = qw(Ir Dr Dw COND IND
                      COND_m IND_m
