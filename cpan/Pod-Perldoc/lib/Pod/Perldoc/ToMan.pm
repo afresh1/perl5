@@ -352,6 +352,9 @@ sub _filter_through_nroff {
 	close $writer;
 	$self->debug( "Done writing\n" );
 
+	# wait for it to exit
+	waitpid( $pid, 0 );
+
 	# read any leftovers
 	$done .= do { local $/; <$reader> };
 	$self->debug( sprintf "Done reading. Output is %d bytes\n",
