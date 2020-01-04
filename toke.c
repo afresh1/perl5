@@ -10328,7 +10328,7 @@ STATIC char *
 S_scan_heredoc(pTHX_ char *s)
 {
     I32 op_type = OP_SCALAR;
-    I32 len;
+    Size_t len;
     SV *tmpstr;
     char term;
     char *d;
@@ -10788,7 +10788,7 @@ S_scan_inputsymbol(pTHX_ char *start)
 {
     char *s = start;		/* current position in buffer */
     char *end;
-    I32 len;
+    Size_t len;
     bool nomagicopen = FALSE;
     char *d = PL_tokenbuf;					/* start of temp holding space */
     const char * const e = PL_tokenbuf + sizeof PL_tokenbuf;	/* end of temp holding space */

@@ -66,7 +66,7 @@ S_isa_lookup(pTHX_ HV *stash, SV *namesv, const char * name, STRLEN len, U32 fla
     /* A stash/class can go by many names (ie. User == main::User), so 
        we use the HvENAME in the stash itself, which is canonical, falling
        back to HvNAME if necessary.  */
-    our_stash = gv_stashsvpvn_cached(namesv, name, len, flags);
+    our_stash = gv_stashsvpvn_cached(namesv, name, (U32) len, flags);
 
     if (our_stash) {
 	HEK *canon_name = HvENAME_HEK(our_stash);
@@ -707,7 +707,7 @@ XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
     /* idea is for SvREFCNT(sv) to be accessed only once */
     refcnt = items == 2 ?
                 /* we free one ref on exit */
-                (SvREFCNT(sv) = SvUV(ST(1)) + 1)
+                (SvREFCNT(sv) = (U32) SvUV(ST(1)) + 1)
                 : SvREFCNT(sv);
     XSRETURN_UV(refcnt - 1); /* Minus the ref created for us. */        
 

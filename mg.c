@@ -1347,7 +1347,7 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
 	    while (s < strend) {
 		char tmpbuf[256];
 		Stat_t st;
-		I32 i;
+		Size_t i;
 #ifdef __VMS  /* Hmm.  How do we get $Config{path_sep} from C? */
 		const char path_sep = PL_perllib_sep;
 #else
@@ -1356,7 +1356,7 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
 		s = delimcpy_no_escape(tmpbuf, tmpbuf + sizeof tmpbuf,
 			     s, strend, path_sep, &i);
 		s++;
-		if (i >= (I32)sizeof tmpbuf   /* too long -- assume the worst */
+		if (i >= sizeof tmpbuf   /* too long -- assume the worst */
 #ifdef __VMS
 		      /* no colon thus no device name -- assume relative path */
 		      || (PL_perllib_sep != ':' && !strchr(tmpbuf, ':'))

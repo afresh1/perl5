@@ -544,10 +544,10 @@ Free_t   Perl_mfree (Malloc_t where)
 
 static char *
 S_delimcpy_intern(char *to, const char *toend, const char *from,
-	   const char *fromend, int delim, I32 *retlen,
+	   const char *fromend, int delim, Size_t *retlen,
 	   const bool allow_escape)
 {
-    I32 tolen;
+    Size_t tolen;
 
     PERL_ARGS_ASSERT_DELIMCPY;
 
@@ -572,7 +572,7 @@ S_delimcpy_intern(char *to, const char *toend, const char *from,
 }
 
 char *
-Perl_delimcpy(char *to, const char *toend, const char *from, const char *fromend, int delim, I32 *retlen)
+Perl_delimcpy(char *to, const char *toend, const char *from, const char *fromend, int delim, Size_t *retlen)
 {
     PERL_ARGS_ASSERT_DELIMCPY;
 
@@ -581,7 +581,7 @@ Perl_delimcpy(char *to, const char *toend, const char *from, const char *fromend
 
 char *
 Perl_delimcpy_no_escape(char *to, const char *toend, const char *from,
-			const char *fromend, int delim, I32 *retlen)
+			const char *fromend, int delim, Size_t *retlen)
 {
     PERL_ARGS_ASSERT_DELIMCPY_NO_ESCAPE;
 
@@ -3130,7 +3130,7 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
     char *xfailed = NULL;
     char tmpbuf[MAXPATHLEN];
     char *s;
-    I32 len = 0;
+    Size_t len = 0;
     int retval;
     char *bufend;
 #if defined(DOSISH) && !defined(OS2)
@@ -3449,7 +3449,7 @@ Perl_getenv_len(pTHX_ const char *env_elem, unsigned long *len)
     PERL_UNUSED_CONTEXT;
     PERL_ARGS_ASSERT_GETENV_LEN;
     if (env_trans)
-	*len = strlen(env_trans);
+	*len = (unsigned long) strlen(env_trans);
     return env_trans;
 }
 #endif
@@ -3822,7 +3822,7 @@ Perl_my_strftime(pTHX_ const char *fmt, int sec, int min, int hour, int mday, in
   char *buf;
   int buflen;
   struct tm mytm;
-  int len;
+  Size_t len;
 
   PERL_ARGS_ASSERT_MY_STRFTIME;
 
@@ -3876,8 +3876,8 @@ Perl_my_strftime(pTHX_ const char *fmt, int sec, int min, int hour, int mday, in
     return buf;
   else {
     /* Possibly buf overflowed - try again with a bigger buf */
-    const int fmtlen = strlen(fmt);
-    int bufsize = fmtlen + buflen;
+    const Size_t fmtlen = strlen(fmt);
+    Size_t bufsize = fmtlen + buflen;
 
     Renew(buf, bufsize, char);
     while (buf) {
@@ -4088,7 +4088,7 @@ static int
 S_socketpair_udp (int fd[2]) {
     dTHX;
     /* Fake a datagram socketpair using UDP to localhost.  */
-    int sockets[2] = {-1, -1};
+    SOCKET sockets[2] = {-1, -1};
     struct sockaddr_in addresses[2];
     int i;
     Sock_size_t size = sizeof(struct sockaddr_in);
