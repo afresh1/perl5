@@ -356,8 +356,10 @@ Perl_av_store(pTHX_ AV *av, SSize_t key, SV *val)
 	}
 	AvFILLp(av) = key;
     }
-    else if (AvREAL(av))
+    else if (AvREAL(av)) {
 	SvREFCNT_dec(ary[key]);
+	assert(SvREFCNT(ary[key]) > 0);
+    }
     ary[key] = val;
     if (SvSMAGICAL(av)) {
 	const MAGIC *mg = SvMAGIC(av);
