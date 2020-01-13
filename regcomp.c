@@ -5335,7 +5335,8 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
             }
 	}
 	else if (REGNODE_VARIES(OP(scan))) {
-	    SSize_t mincount, maxcount, minnext, deltanext, pos_before = 0;
+	    Size_t mincount, maxcount;
+            SSize_t minnext, deltanext, pos_before = 0;
 	    I32 fl = 0, f = flags;
 	    regnode * const oscan = scan;
 	    regnode_ssc this_class;
