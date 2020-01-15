@@ -535,24 +535,24 @@ Perl_grok_bin_oct_hex(pTHX_ const char *start,
 
         if (*s) {
             if (   ! (input_flags & PERL_SCAN_SILENT_ILLDIGIT)
-            &&    ckWARN(WARN_DIGIT))
-        {
-            if (base != 8) {
-                Perl_warner(aTHX_ packWARN(WARN_DIGIT),
-                                   "Illegal %s digit '%c' ignored",
-                                   ((base == 2)
-                                    ? "binary"
-                                      : "hexadecimal"),
-                                    *s);
-            }
-            else if (isDIGIT(*s)) { /* octal base */
+                &&    ckWARN(WARN_DIGIT))
+            {
+                if (base != 8) {
+                    Perl_warner(aTHX_ packWARN(WARN_DIGIT),
+                                           "Illegal %s digit '%c' ignored",
+                                           ((base == 2)
+                                            ? "binary"
+                                              : "hexadecimal"),
+                                            *s);
+                }
+                else if (isDIGIT(*s)) { /* octal base */
 
-                /* Allow \octal to work the DWIM way (that is, stop scanning as
-                 * soon as non-octal characters are seen, complain only if
-                 * someone seems to want to use the digits eight and nine.
-                 * Since we know it is not octal, then if isDIGIT, must be an 8
-                 * or 9). */
-                Perl_warner(aTHX_ packWARN(WARN_DIGIT),
+                    /* Allow \octal to work the DWIM way (that is, stop
+                     * scanning as soon as non-octal characters are seen,
+                     * complain only if someone seems to want to use the digits
+                     * eight and nine.  Since we know it is not octal, then if
+                     * isDIGIT, must be an 8 or 9). */
+                    Perl_warner(aTHX_ packWARN(WARN_DIGIT),
                                        "Illegal octal digit '%c' ignored", *s);
                 }
             }
