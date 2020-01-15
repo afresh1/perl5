@@ -13969,6 +13969,10 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
                        || ! is_PATWS_safe((p), RExC_end, UTF));
 
 		switch ((U8)*p) {
+                  const char* message;
+                  U32 packed_warn;
+                  U8 grok_c_char;
+
 		case '^':
 		case '$':
 		case '.':
@@ -14135,10 +14139,24 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 			    break;
 			}
 		    case 'c':
-			p++;
-			ender = grok_bslash_c(*p, TO_OUTPUT_WARNINGS(p));
-                        UPDATE_WARNINGS_LOC(p);
                         p++;
+                        if (! grok_bslash_c(*p, &grok_c_char,
+                                            &message, &packed_warn))
+                        {
+                            /* going to die anyway; point to exact spot of
+                             * failure */
+                            RExC_parse = p + ((UTF)
+                                              ? UTF8_SAFE_SKIP(p, RExC_end)
+                                              : 1);
+                            vFAIL(message);
+                        }
+
+                        ender = grok_c_char;
+                        p++;
+                        if (message && TO_OUTPUT_WARNINGS(p)) {
+                            warn_non_literal_string(p, packed_warn, message);
+                        }
+
 			break;
                     case '8': case '9': /* must be a backreference */
                         --p;
@@ -17373,6 +17391,9 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
              * is already in 'value'.  Otherwise, need to translate the escape
              * into what it signifies. */
             if (! skip_white || ! isBLANK_A(value)) switch ((I32)value) {
+                const char * message;
+                U32 packed_warn;
+                U8 grok_c_char;
 
 	    case 'w':	namedclass = ANYOF_WORDCHAR;	break;
 	    case 'W':	namedclass = ANYOF_NWORDCHAR;	break;
@@ -17658,9 +17679,23 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                 non_portable_endpoint++;
 		break;
 	    case 'c':
-		value = grok_bslash_c(*RExC_parse, TO_OUTPUT_WARNINGS(RExC_parse));
-                UPDATE_WARNINGS_LOC(RExC_parse);
-		RExC_parse++;
+                if (! grok_bslash_c(*RExC_parse, &grok_c_char, &message,
+                                                                &packed_warn))
+                {
+                    /* going to die anyway; point to exact spot of
+                        * failure */
+                    RExC_parse += (UTF)
+                                  ? UTF8_SAFE_SKIP(RExC_parse, RExC_end)
+                                  : 1;
+                    vFAIL(message);
+                }
+
+                value = grok_c_char;
+                RExC_parse++;
+                if (message && TO_OUTPUT_WARNINGS(RExC_parse)) {
+                    warn_non_literal_string(RExC_parse, packed_warn, message);
+                }
+
                 non_portable_endpoint++;
 		break;
 	    case '0': case '1': case '2': case '3': case '4':
