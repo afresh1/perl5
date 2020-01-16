@@ -3552,12 +3552,12 @@ S_scan_const(pTHX_ char *start)
 		{
 		    const char* error;
 
-		    bool valid = grok_bslash_o(&s, send,
+		    if (! grok_bslash_o(&s, send,
                                                &uv, &error,
-                                               TRUE, /* Output warning */
+                                               NULL,
                                                FALSE, /* Not strict */
-                                               UTF);
-		    if (! valid) {
+                                               UTF))
+                    {
 			yyerror(error);
 			uv = 0; /* drop through to ensure range ends are set */
 		    }
@@ -3569,12 +3569,12 @@ S_scan_const(pTHX_ char *start)
 		{
 		    const char* error;
 
-		    bool valid = grok_bslash_x(&s, send,
+		    if (! grok_bslash_x(&s, send,
                                                &uv, &error,
-                                               TRUE, /* Output warning */
+                                               NULL,
                                                FALSE, /* Not strict */
-                                               UTF);
-		    if (! valid) {
+                                               UTF))
+                    {
 			yyerror(error);
 			uv = 0; /* drop through to ensure range ends are set */
 		    }

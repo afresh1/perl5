@@ -14088,56 +14088,49 @@ S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 			p++;
 			break;
 		    case 'o':
-			{
-			    UV result;
-			    const char* error_msg;
+                        if (! grok_bslash_o(&p,
+                                            RExC_end,
+                                            &ender,
+                                            &message,
+                                            &packed_warn,
+                                            (bool) RExC_strict,
+                                            UTF))
+                        {
+                            RExC_parse = p; /* going to die anyway; point to
+                                               exact spot of failure */
+                            vFAIL(message);
+                        }
 
-			    bool valid = grok_bslash_o(&p,
-                                                       RExC_end,
-						       &result,
-						       &error_msg,
-						       TO_OUTPUT_WARNINGS(p),
-                                                       (bool) RExC_strict,
-                                                       UTF);
-			    if (! valid) {
-				RExC_parse = p;	/* going to die anyway; point
-						   to exact spot of failure */
-				vFAIL(error_msg);
-			    }
-                            UPDATE_WARNINGS_LOC(p - 1);
-                            ender = result;
-			    break;
-			}
+                        if (message && TO_OUTPUT_WARNINGS(p)) {
+                            warn_non_literal_string(p, packed_warn, message);
+                        }
+                        break;
 		    case 'x':
-			{
-                            UV result = UV_MAX; /* initialize to erroneous
-                                                   value */
-			    const char* error_msg;
+                        if (! grok_bslash_x(&p,
+                                            RExC_end,
+                                            &ender,
+                                            &message,
+                                            &packed_warn,
+                                            (bool) RExC_strict,
+                                            UTF))
+                        {
+                            RExC_parse = p;	/* going to die anyway; point
+                                                   to exact spot of failure */
+                            vFAIL(message);
+                        }
 
-			    bool valid = grok_bslash_x(&p,
-                                                       RExC_end,
-						       &result,
-						       &error_msg,
-                                                       TO_OUTPUT_WARNINGS(p),
-                                                       (bool) RExC_strict,
-                                                       UTF);
-			    if (! valid) {
-				RExC_parse = p;	/* going to die anyway; point
-						   to exact spot of failure */
-				vFAIL(error_msg);
-			    }
-                            UPDATE_WARNINGS_LOC(p - 1);
-                            ender = result;
+                        if (message && TO_OUTPUT_WARNINGS(p)) {
+                            warn_non_literal_string(p, packed_warn, message);
+                        }
 
 #ifdef EBCDIC
-                            if (ender < 0x100) {
-                                if (RExC_recode_x_to_native) {
-                                    ender = LATIN1_TO_NATIVE(ender);
-                                }
-			    }
+                        if (ender < 0x100) {
+                            if (RExC_recode_x_to_native) {
+                                ender = LATIN1_TO_NATIVE(ender);
+                            }
+                        }
 #endif
-			    break;
-			}
+                        break;
 		    case 'c':
                         p++;
                         if (! grok_bslash_c(*p, &grok_c_char,
@@ -16961,6 +16954,7 @@ S_output_posix_warnings(pTHX_ RExC_state_t *pRExC_state, AV* posix_warnings)
     PERL_ARGS_ASSERT_OUTPUT_POSIX_WARNINGS;
 
     if (! TO_OUTPUT_WARNINGS(RExC_parse)) {
+        CLEAR_POSIX_WARNINGS();
         return;
     }
 
@@ -17644,38 +17638,38 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
 	    case 'a':	value = '\a';                   break;
 	    case 'o':
 		RExC_parse--;	/* function expects to be pointed at the 'o' */
-		{
-		    const char* error_msg;
-		    bool valid = grok_bslash_o(&RExC_parse,
-                                               RExC_end,
-					       &value,
-					       &error_msg,
-                                               TO_OUTPUT_WARNINGS(RExC_parse),
-                                               strict,
-                                               UTF);
-		    if (! valid) {
-			vFAIL(error_msg);
-		    }
-                    UPDATE_WARNINGS_LOC(RExC_parse - 1);
-		}
+                if (! grok_bslash_o(&RExC_parse,
+                                            RExC_end,
+                                            &value,
+                                            &message,
+                                            &packed_warn,
+                                            strict,
+                                            UTF))
+                {
+                    vFAIL(message);
+                }
+                else if (message && TO_OUTPUT_WARNINGS(RExC_parse)) {
+                    warn_non_literal_string(RExC_parse, packed_warn, message);
+                }
+
                 non_portable_endpoint++;
 		break;
 	    case 'x':
 		RExC_parse--;	/* function expects to be pointed at the 'x' */
-		{
-		    const char* error_msg;
-		    bool valid = grok_bslash_x(&RExC_parse,
-                                               RExC_end,
-					       &value,
-					       &error_msg,
-					       TO_OUTPUT_WARNINGS(RExC_parse),
-                                               strict,
-                                               UTF);
-                    if (! valid) {
-			vFAIL(error_msg);
-		    }
-                    UPDATE_WARNINGS_LOC(RExC_parse - 1);
-		}
+                if (!  grok_bslash_x(&RExC_parse,
+                                            RExC_end,
+                                            &value,
+                                            &message,
+                                            &packed_warn,
+                                            strict,
+                                            UTF))
+                {
+                    vFAIL(message);
+                }
+                else if (message && TO_OUTPUT_WARNINGS(RExC_parse)) {
+                    warn_non_literal_string(RExC_parse, packed_warn, message);
+                }
+
                 non_portable_endpoint++;
 		break;
 	    case 'c':
