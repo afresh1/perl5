@@ -1160,8 +1160,6 @@ EpRX	|SV *|form_alien_digit_msg|const U8 which		\
 				|NN const char * const send	\
 				|const bool UTF			\
 				|const bool braced
-EiR	|char*|form_short_octal_warning|NN const char * const s  \
-				|const STRLEN len
 EiRT	|I32	|regcurly	|NN const char *s
 #endif
 AMpd	|UV	|grok_hex	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
