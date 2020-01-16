@@ -2700,7 +2700,7 @@ ES	|I32	|make_trie	|NN RExC_state_t *pRExC_state \
 ES	|regnode *|construct_ahocorasick_from_trie|NN RExC_state_t *pRExC_state \
                                 |NN regnode *source|U32 depth
 ETSR	|const char *|cntrl_to_mnemonic|const U8 c
-ETSR	|int	|edit_distance	|NN const UV *src		    \
+ETSR	|IV	|edit_distance	|NN const UV *src		    \
 				|NN const UV *tgt		    \
 				|const STRLEN x			    \
 				|const STRLEN y			    \

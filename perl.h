@@ -1251,9 +1251,9 @@ EXTERN_C int usleep(unsigned int);
  * e.g. in Gentoo, see http://bugs.gentoo.org/show_bug.cgi?id=12605 */
 #if defined(HAS_SOCKATMARK) && !defined(HAS_SOCKATMARK_PROTO)
 # if defined(__THROW) && defined(__GLIBC__)
-int sockatmark(int) __THROW;
+EXTERN_C int sockatmark(int) __THROW;
 # else
-int sockatmark(int);
+EXTERN_C int sockatmark(int);
 # endif
 #endif
 
@@ -3739,7 +3739,7 @@ hint to the compiler that this condition is likely to be false.
 #endif
 
 #ifdef __CYGWIN__
-void init_os_extras(void);
+EXTERN_C void init_os_extras(void);
 #endif
 
 #ifdef UNION_ANY_DEFINITION
@@ -4421,11 +4421,11 @@ I32 unlnk (pTHX_ const char*);
 
 /* some versions of glibc are missing the setresuid() proto */
 #if defined(HAS_SETRESUID) && !defined(HAS_SETRESUID_PROTO)
-int setresuid(uid_t ruid, uid_t euid, uid_t suid);
+EXTERN_C int setresuid(uid_t ruid, uid_t euid, uid_t suid);
 #endif
 /* some versions of glibc are missing the setresgid() proto */
 #if defined(HAS_SETRESGID) && !defined(HAS_SETRESGID_PROTO)
-int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
+EXTERN_C int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 #endif
 
 #ifndef HAS_SETREUID
@@ -7155,7 +7155,7 @@ A synonym for L</grok_numeric_radix>
 
 /* to let user control profiling */
 #ifdef PERL_GPROF_CONTROL
-extern void moncontrol(int);
+EXTERN_C void moncontrol(int);
 #define PERL_GPROF_MONCONTROL(x) moncontrol(x)
 #else
 #define PERL_GPROF_MONCONTROL(x)

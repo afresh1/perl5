@@ -1317,7 +1317,7 @@ dict_free(item* head)
 /* End of Dictionary Stuff */
 
 /* All calculations/work are done here */
-STATIC int
+STATIC IV
 S_edit_distance(const UV* src,
                 const UV* tgt,
                 const STRLEN x,             /* length of src[] */
