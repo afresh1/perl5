@@ -1162,7 +1162,7 @@ EpRX	|SV *|form_alien_digit_msg|const U8 which		\
 				|const bool braced
 #endif
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_IN_TOKE_C)
-EiRT	|I32	|regcurly	|NN const char *s
+EiRT	|bool	|regcurly	|NN const char *s
 #endif
 AMpd	|UV	|grok_hex	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
 Apd	|int	|grok_infnan	|NN const char** sp|NN const char *send
