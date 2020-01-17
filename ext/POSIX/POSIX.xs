@@ -3359,14 +3359,12 @@ mblen(s, n = ~0)
 	size_t		n
     CODE:
         errno = 0;
+
+        SvGETMAGIC(s);
         if (! SvOK(s)) {
 #ifdef USE_MBRLEN
-            /* Initialize the shift state in PL_mbrlen_ps.  It's a good guess
-             * that the initial state is all zeros.  On some platforms, it is
-             * documented that pointing the first parameter to L'\0'
-             * initializes the state; on others, that doesn't work, but making
-             * the parameter NULL does.  Perhaps NULL works on all platforms,
-             * but this seems safer. */
+            /* Initialize the shift state in PL_mbrlen_ps.  The Standard says
+             * that should be all zeros. */
             memzero(&PL_mbrlen_ps, sizeof(PL_mbrlen_ps));
             RETVAL = 0;
 #else
@@ -3377,7 +3375,7 @@ mblen(s, n = ~0)
         }
         else {  /* Not resetting state */
             size_t len;
-            char * string = SvPV(s, len);
+            char * string = SvPV_nomg(s, len);
             if (n < len) len = n;
 #ifdef USE_MBRLEN
             RETVAL = (SSize_t) mbrlen(string, len, &PL_mbrlen_ps);
@@ -3413,12 +3411,10 @@ mbtowc(pwc, s, n = ~0)
 	size_t		n
     CODE:
         errno = 0;
+        SvGETMAGIC(s);
         if (! SvOK(s)) { /* Initialize state */
 #ifdef USE_MBRTOWC
-            /* Initialize the shift state in PL_mbrtowc_ps.  It's a good guess
-             * that the initial state is all zeros.  On some platforms, It is
-             * even documented so.  Otherwise, the man pages are incomplete or
-             * vary about how to do this. */
+            /* Initialize the shift state to all zeros in PL_mbrtowc_ps. */
             memzero(&PL_mbrtowc_ps, sizeof(PL_mbrtowc_ps));
             RETVAL = 0;
 #else
@@ -3429,7 +3425,7 @@ mbtowc(pwc, s, n = ~0)
         }
         else {  /* Not resetting state */
             size_t len;
-            char * string = SvPV(s, len);
+            char * string = SvPV_nomg(s, len);
             wchar_t wc;
             if (n < len) len = n;
 #ifdef USE_MBRTOWC
@@ -3469,6 +3465,7 @@ wctomb(s, wchar)
 	wchar_t		wchar
     CODE:
         errno = 0;
+        SvGETMAGIC(s);
         if (s == &PL_sv_undef) {
 #ifdef USE_WCRTOMB
             /* The man pages khw looked at are in agreement that this works.
@@ -3492,8 +3489,7 @@ wctomb(s, wchar)
             LOCALE_UNLOCK;
 #endif
             if (RETVAL >= 0) {
-                sv_setpvn(s, buffer, RETVAL);
-                sv_setpv_bufsize(s, RETVAL, RETVAL);
+                sv_setpvn_mg(s, buffer, RETVAL);
             }
         }
     OUTPUT:
