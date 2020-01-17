@@ -10748,7 +10748,7 @@ chmod +x protochk
 $eunicefix protochk
 
 : Define hasproto macro for Configure internal use
-hasproto='varname=$1; func=$2; shift; shift;
+hasproto='set -x; varname=$1; func=$2; shift; shift;
 while $test $# -ge 2; do
 	case "$1" in
 	$define) echo "#include <$2>";;
