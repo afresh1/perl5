@@ -895,12 +895,13 @@ static const scan_data_t zero_scan_data = {
 #define reg_warn_non_literal_string(loc, m)                             \
                 warn_non_literal_string(loc, packWARN(WARN_REGEXP), m)
 
-#define	ckWARN2_non_literal_string(loc, packwarn, m, a1)                    \
+#define ckWARN2_non_literal_string(loc, packwarn, m, a1)                    \
     STMT_START {                                                            \
                 char * format;                                              \
-                Newx(format, strlen(m) + strlen(REPORT_LOCATION) + 1, char);\
-                strcpy(format, m);                                          \
-                strcat(format, REPORT_LOCATION);                            \
+                Size_t format_size = 5 /*strlen(m) + strlen(REPORT_LOCATION)-19*/; \
+                Newx(format, format_size, char);                            \
+                my_strlcpy(format, m, format_size);                         \
+                my_strlcat(format, REPORT_LOCATION, format_size);           \
                 SAVEFREEPV(format);                                         \
                 _WARN_HELPER(loc, packwarn,                                 \
                       Perl_ck_warner(aTHX_ packwarn,                        \
