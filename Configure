@@ -21494,9 +21494,9 @@ rp="What is the type used for the length parameter for string functions?"
 set size_t sizetype 'unsigned int' stdio.h sys/types.h
 eval $typedef_ask
 
+set -x
 : check for type of arguments to gethostbyaddr.
 if test "X$netdb_host_type" = X -o "X$netdb_hlen_type" = X; then
-set -x
 	case "$d_gethbyaddr" in
 	$define)
 		$cat <<EOM
@@ -21621,6 +21621,7 @@ EOM
 		netdb_net_type='long'
 		;;
 	esac
+set +x
 fi
 : locate the preferred pager for this system
 fn=f/
